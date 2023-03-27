@@ -18,6 +18,7 @@ public class ModelTest {
     public static HttpClient client;
     public static URI filmsUri;
     public static URI usersUri;
+
     @BeforeAll
     public static void run() {
         SpringApplication.run(FilmorateApplication.class);
