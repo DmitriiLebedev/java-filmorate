@@ -13,16 +13,17 @@ import java.net.http.HttpResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FilmTest {
+public class ModelTest {
 
     public static HttpClient client;
-    public static URI uri;
-
+    public static URI filmsUri;
+    public static URI usersUri;
     @BeforeAll
     public static void run() {
         SpringApplication.run(FilmorateApplication.class);
         client = HttpClient.newHttpClient();
-        uri = URI.create("http://localhost:8080/films");
+        filmsUri = URI.create("http://localhost:8080/films");
+        usersUri = URI.create("http://localhost:8080/users");
     }
 
     @Test
@@ -34,7 +35,7 @@ public class FilmTest {
                 "  \"duration\": 20\n" +
                 "}";
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
+                .uri(filmsUri)
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
@@ -53,7 +54,7 @@ public class FilmTest {
                 "  \"duration\": 20\n" +
                 "}";
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
+                .uri(filmsUri)
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
@@ -70,7 +71,7 @@ public class FilmTest {
                 "  \"duration\": 20\n" +
                 "}";
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
+                .uri(filmsUri)
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
@@ -87,7 +88,75 @@ public class FilmTest {
                 "  \"duration\": -20\n" +
                 "}";
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
+                .uri(filmsUri)
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .header("Content-Type", "application/json")
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(response.statusCode(), 400);
+    }
+
+    @Test
+    public void emailCantBeEmpty() throws IOException, InterruptedException {
+        String json = "{" +
+                "  \"login\": \"login\"," +
+                "  \"name\": \"name\"," +
+                "  \"email\": \"\"," +
+                "  \"birthday\": \"1980-08-20\"" +
+                "}";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(usersUri)
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .header("Content-Type", "application/json")
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(response.statusCode(), 400);
+    }
+
+    @Test
+    public void emailShouldContainAddressSign() throws IOException, InterruptedException {
+        String json = "{" +
+                "  \"login\": \"login\"," +
+                "  \"name\": \"name\"," +
+                "  \"email\": \"foo.gmail.com\"," +
+                "  \"birthday\": \"1980-08-20\"" +
+                "}";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(usersUri)
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .header("Content-Type", "application/json")
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(response.statusCode(), 400);
+    }
+
+    @Test
+    public void loginCantBeEmpty() throws IOException, InterruptedException {
+        String json = "{" +
+                "  \"login\": \"\"," +
+                "  \"name\": \"name\"," +
+                "  \"email\": \"foo@gmail.com\"," +
+                "  \"birthday\": \"1980-08-20\"" +
+                "}";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(usersUri)
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .header("Content-Type", "application/json")
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(response.statusCode(), 400);
+    }
+
+    @Test
+    public void dateOfBirthShouldBeInPast() throws IOException, InterruptedException {
+        String json = "{" +
+                "  \"login\": \"login\"," +
+                "  \"name\": \"name\"," +
+                "  \"email\": \"foo@gmail.com\"," +
+                "  \"birthday\": \"2222-08-20\"" +
+                "}";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(usersUri)
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .header("Content-Type", "application/json")
                 .build();
