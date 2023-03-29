@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = AfterDateValidator.class)
 @Documented
-public @interface After1895 {
+public @interface DateValidator {
     String message() default "Date can't be earlier than 28.12.1895";
 
     Class<?>[] groups() default {};

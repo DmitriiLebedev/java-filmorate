@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import ru.yandex.practicum.filmorate.validation.After1895;
+import ru.yandex.practicum.filmorate.validation.DateValidator;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ public class Film {
     @Size(max = 200, message = "Description can't be longer than 200 characters")
     private String description;
 
-    @After1895
+    @DateValidator
     private LocalDate releaseDate;
 
     @Positive(message = "Duration must be positive")

@@ -5,9 +5,9 @@ import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 import java.time.temporal.Temporal;
 
-class AfterDateValidator implements ConstraintValidator<After1895, Temporal> {
+class AfterDateValidator implements ConstraintValidator<DateValidator, Temporal> {
     @Override
-    public void initialize(After1895 annotation) {
+    public void initialize(DateValidator annotation) {
     }
 
     @Override
