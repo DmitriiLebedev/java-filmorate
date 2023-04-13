@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface FilmService {
-    Film putFilm(Film film);
+    Film addFilm(Film film);
 
     Film getFilm(int id);
 
