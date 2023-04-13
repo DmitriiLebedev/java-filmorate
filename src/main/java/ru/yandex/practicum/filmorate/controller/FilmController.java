@@ -51,8 +51,8 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getTopFilms
-            (@RequestParam(required = false, defaultValue = "10") @Positive int count) throws ValidationException {
+    public List<Film> getTopFilms(@RequestParam(required = false, defaultValue = "10") @Positive int count)
+            throws ValidationException {
         log.info("GET request for top films with count parameter - " + count);
         return filmService.getTopFilms(count);
     }
