@@ -22,7 +22,7 @@ public class UserController {
     @PostMapping
     public User post(@Valid @RequestBody User user) throws ValidationException {
         log.info("POST request for users");
-        return userService.putUser(user);
+        return userService.addUser(user);
     }
 
     @PutMapping
