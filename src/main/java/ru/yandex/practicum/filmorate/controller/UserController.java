@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -46,11 +45,11 @@ public class UserController {
     @GetMapping("/{id}")
     public User get(@PathVariable int id) {
         log.info("GET request for user id " + id);
-        return userService.getUser(id);
+        return userService.getUserByID(id);
     }
 
     @GetMapping("/{id}/friends")
-    public ArrayList<User> getFriends(@PathVariable int id) {
+    public List<User> getFriends(@PathVariable int id) {
         log.info("GET request for friends of user id " + id);
         return userService.getFriends(id);
     }
@@ -66,5 +65,6 @@ public class UserController {
         log.info("DELETE friend request for user id " + id + " and friend id " + friendId);
         userService.removeFriend(id, friendId);
     }
+
 }
 

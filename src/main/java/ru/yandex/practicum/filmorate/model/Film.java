@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.yandex.practicum.filmorate.validation.DateValidator;
 
 import javax.validation.constraints.NotBlank;
@@ -14,9 +16,11 @@ import java.util.Set;
 
 
 @Data
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class Film {
-    @JsonIgnore
-    Set<Integer> users = new HashSet<>();
+
     private int id;
     @NotNull(message = "Name can't be null")
     @NotBlank(message = "Name can't be empty")
@@ -27,9 +31,8 @@ public class Film {
     private LocalDate releaseDate;
     @Positive(message = "Duration must be positive")
     private int duration;
-
-    public int getUsersSize() {
-        return users.size();
-    }
+    private int rate;
+    private Mpa mpa;
+    private Set<Genre> genres = new HashSet<>();
 
 }
