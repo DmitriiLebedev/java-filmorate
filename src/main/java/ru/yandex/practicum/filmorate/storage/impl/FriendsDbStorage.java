@@ -20,8 +20,9 @@ public class FriendsDbStorage implements FriendsStorage {
 
     @Override
     public List<User> getFriends(int id) {
-        return jdbcTemplate.query("SELECT * FROM users WHERE user_id IN (SELECT friend_id AS id FROM friends" +
-                " WHERE user_id = ?) ORDER BY user_id", (rs, rowNum) -> createUser(rs), id);
+        return jdbcTemplate.query("SELECT * FROM users AS u " +
+                "INNER JOIN friends AS f ON u.user_id=f.friend_id " +
+                "WHERE f.user_id = ? GROUP BY f.friend_id", (rs, rowNum) -> createUser(rs), id);
     }
 
     @Override

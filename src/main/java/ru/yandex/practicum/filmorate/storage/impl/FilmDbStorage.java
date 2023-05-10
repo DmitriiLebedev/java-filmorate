@@ -9,11 +9,11 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,6 +23,8 @@ import java.util.Objects;
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final MpaDbStorage mpaDbStorage;
+    private final GenreDbStorage genreDbStorage;
 
     @Override
     public Film save(Film film) {
@@ -53,7 +55,7 @@ public class FilmDbStorage implements FilmStorage {
                     .description(filmRows.getString("description"))
                     .releaseDate(Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate())
                     .duration(filmRows.getInt("duration"))
-                    .mpa(new Mpa(filmRows.getInt("mpa_id")))
+                    .mpa(mpaDbStorage.getMpaById(filmRows.getInt("mpa_id")))
                     .build();
         } else {
             throw new FilmNotFoundException(String.format("Can't find film: id=%d in storage", id));
@@ -78,9 +80,23 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Integer> findAllFilms() {
-        return jdbcTemplate.query("SELECT film_id FROM films ORDER BY film_id;",
-                ((rs, rowNum) -> rs.getInt("film_id")));
+    public List<Film> findAllFilms() {
+        List<Film> films = new ArrayList<>();
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("SELECT film_id, film_name, description," +
+                " release_date, duration, mpa_id FROM films");
+        while (filmRows.next()) {
+            Film film = Film.builder()
+                    .id(filmRows.getInt("film_id"))
+                    .name(filmRows.getString("film_name"))
+                    .description(filmRows.getString("description"))
+                    .releaseDate(Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate())
+                    .duration(filmRows.getInt("duration"))
+                    .mpa(mpaDbStorage.getMpaById(filmRows.getInt("mpa_id")))
+                    .build();
+            film.setGenres(genreDbStorage.getFilmGenres(film.getId()));
+            films.add(film);
+        }
+        return films;
     }
 
     @Override

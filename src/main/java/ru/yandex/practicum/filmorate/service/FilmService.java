@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,7 +21,7 @@ public class FilmService {
     private final MpaStorage mpaStorage;
 
     public List<Film> getAllFilms() {
-        return filmStorage.findAllFilms().stream().map(this::getFilm).collect(Collectors.toList());
+        return filmStorage.findAllFilms();
     }
 
     public Film getFilm(int id) {
@@ -58,11 +57,7 @@ public class FilmService {
     }
 
     public List<Film> getTopFilms(int count) {
-        List<Integer> topFilms = likesStorage.findPopular(count);
-        if (!topFilms.isEmpty()) {
-            return topFilms.stream().map(this::getFilm).collect(Collectors.toList());
-        }
-        return getAllFilms().stream().limit(count).collect(Collectors.toList());
+        return likesStorage.findPopular(count);
     }
 
 }
