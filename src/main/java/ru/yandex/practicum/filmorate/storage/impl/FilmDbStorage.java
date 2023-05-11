@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.Date;
@@ -47,7 +48,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film findFilmById(int id) {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("SELECT * FROM films WHERE film_id = ?", id);
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("SELECT F.film_id, F.film_name, F.description, " +
+                "F.release_date, F.duration, M.mpa_id, M.mpa_name " +
+                "FROM films AS F " +
+                "JOIN mpa_rating AS M ON F.mpa_id=M.mpa_id " +
+                "WHERE F.film_id = ?", id);
         if (filmRows.next()) {
             return Film.builder()
                     .id(filmRows.getInt("film_id"))
@@ -55,7 +60,7 @@ public class FilmDbStorage implements FilmStorage {
                     .description(filmRows.getString("description"))
                     .releaseDate(Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate())
                     .duration(filmRows.getInt("duration"))
-                    .mpa(mpaDbStorage.getMpaById(filmRows.getInt("mpa_id")))
+                    .mpa(new Mpa(filmRows.getInt("mpa_id"), filmRows.getString("mpa_name")))
                     .build();
         } else {
             throw new FilmNotFoundException(String.format("Can't find film: id=%d in storage", id));
@@ -82,8 +87,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> findAllFilms() {
         List<Film> films = new ArrayList<>();
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("SELECT film_id, film_name, description," +
-                " release_date, duration, mpa_id FROM films");
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("SELECT F.film_id, F.film_name, F.description, " +
+                "F.release_date, F.duration, M.mpa_id, M.mpa_name " +
+                "FROM films AS F " +
+                "JOIN mpa_rating AS M ON F.mpa_id=M.mpa_id ");
         while (filmRows.next()) {
             Film film = Film.builder()
                     .id(filmRows.getInt("film_id"))
@@ -91,7 +98,7 @@ public class FilmDbStorage implements FilmStorage {
                     .description(filmRows.getString("description"))
                     .releaseDate(Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate())
                     .duration(filmRows.getInt("duration"))
-                    .mpa(mpaDbStorage.getMpaById(filmRows.getInt("mpa_id")))
+                    .mpa(new Mpa(filmRows.getInt("mpa_id"), filmRows.getString("mpa_name")))
                     .build();
             film.setGenres(genreDbStorage.getFilmGenres(film.getId()));
             films.add(film);
