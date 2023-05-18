@@ -1,18 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 
 @Data
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class User {
-    @JsonIgnore
-    Set<Integer> friends = new HashSet<>();
     private int id;
     @Email(message = "Email must be valid")
     @NotNull(message = "Email can't be null")
@@ -26,4 +27,6 @@ public class User {
     @Past(message = "Birthday can't be in future")
     @NotNull(message = "Birthday can't be empty")
     private LocalDate birthday;
+
+
 }
